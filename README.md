@@ -10,15 +10,15 @@ Design pattern'ler:
 
 ## 2. Design Pattern Türleri
 
-- **Creational:** Nesne oluşturmayı yönetir (Singleton, Factory)
-- **Structural:** Nesneler arası ilişkileri düzenler (Decorator, Adapter)
-- **Behavioral:** Nesneler arası etkileşimleri yönetir (Observer, Strategy, Command, Template)
+- **Creational:** Nesne oluşturmayı yönetir (Singleton, Factory, Prototype)
+- **Structural:** Nesneler arası ilişkileri düzenler (Decorator, Facade)
+- **Behavioral:** Nesneler arası etkileşimleri yönetir (Observer, Strategy, Template)
 
 ---
 
 ## 3. Ruby’de Yaygın Kullanılan Pattern'ler
 
-### Singleton Pattern
+### Singleton Pattern (Creational)
 
 **🧠 Problem:**  
 Uygulamada yalnızca bir tane olması gereken bir nesne vardır (örneğin: konfigürasyon yöneticisi, log yöneticisi). Ancak her `new` çağrısında yeni bir örnek oluşturulur.
@@ -46,70 +46,7 @@ puts AppConfig.instance.get(:theme)
 
 ---
 
-### Prototype Pattern
-**🧠 Problem:**  
-Bir nesnenin oluşturulmasında ortak özellikler kullanılacaksa, bu ortak özellikleri `new` ile tekrar vererek oluşturmamız gerekir.
-
-**✅ Çözüm:**  
-Bu nesnede bir sürü ortak özellik varsa ve yeni nesnede sadece isim değişecek ise new ile nesne oluşturmak yerine mevcut bir nesnenin clone oluşturup bu yeni nesnede daha az değişiklik yaparak kullanabiliriz.
-
-```ruby
-class Robot
-  attr_accessor :name, :type
-
-  def initialize(name, type)
-    @name = name
-    @type = type
-  end
-
-  def clone
-    self.dup
-  end
-end
-
-prototype = Robot.new("RX-0", "Worker")
-
-robot1 = prototype.clone
-robot1.name = "RX-1"
-```
-
----
-
-### Observer Pattern
-
-**🧠 Problem:**  
-Bir nesnede (subject) değişiklik olduğunda, bu değişiklikten haberdar olması gereken başka nesneler (observers) olabilir. Ancak doğrudan çağrı yapılması, bileşenleri birbirine sıkı sıkıya bağlar.
-
-**✅ Çözüm:**  
-Observer pattern, "yayınla-abone ol" (publish-subscribe) ilişkisi kurar. Subject değiştiğinde, tüm subscriber'lar otomatik olarak bilgilendirilir.
-
-```ruby
-require 'observer'
-
-class NewsAgency
-  include Observable
-
-  def publish(news)
-    changed
-    notify_observers(news)
-  end
-end
-
-class Subscriber
-  def update(news)
-    puts "Yeni haber: #{news}"
-  end
-end
-
-agency = NewsAgency.new
-user = Subscriber.new
-agency.add_observer(user)
-agency.publish("Ruby 4.0 duyuruldu!")
-```
-
----
-
-### Factory Pattern
+### Factory Pattern (Creational)
 
 **🧠 Problem:**  
 Kodda hangi sınıftan nesne oluşturulacağını bilmek istemiyoruz. Örneğin, kullanıcıdan gelen bir tür bilgisine göre farklı sınıflar kullanılabilir.
@@ -142,44 +79,36 @@ n.send
 
 ---
 
-### Strategy Pattern
-
+### Prototype Pattern (Creational)
 **🧠 Problem:**  
-Bir işlemin (örneğin ödeme) birden fazla yolu olabilir ve bu yollar koşullarla belirleniyor olabilir. Koşul içeren if/else yapıları kodu karmaşıklaştırır.
+Bir nesnenin oluşturulmasında ortak özellikler kullanılacaksa, bu ortak özellikleri `new` ile tekrar vererek oluşturmamız gerekir.
 
 **✅ Çözüm:**  
-Strategy pattern, davranışları sınıflar haline getirir ve çalışma zamanında bunları değiştirebilir hale getirir.
+Bu nesnede bir sürü ortak özellik varsa ve yeni nesnede sadece isim değişecek ise new ile nesne oluşturmak yerine mevcut bir nesnenin clone oluşturup bu yeni nesnede daha az değişiklik yaparak kullanabiliriz.
 
 ```ruby
-class PaymentContext
-  def initialize(strategy)
-    @strategy = strategy
+class Robot
+  attr_accessor :name, :type
+
+  def initialize(name, type)
+    @name = name
+    @type = type
   end
 
-  def pay(amount)
-    @strategy.pay(amount)
-  end
-end
-
-class CreditCard
-  def pay(amount)
-    puts "#{amount} TL kredi kartıyla ödendi"
+  def clone
+    self.dup
   end
 end
 
-class PayPal
-  def pay(amount)
-    puts "#{amount} TL PayPal ile ödendi"
-  end
-end
+prototype = Robot.new("RX-0", "Worker")
 
-context = PaymentContext.new(PayPal.new)
-context.pay(150)
+robot1 = prototype.clone
+robot1.name = "RX-1"
 ```
 
 ---
 
-### Decorator Pattern
+### Decorator Pattern (Structural)
 
 **🧠 Problem:**  
 Bir sınıfa yeni özellikler eklemek istiyoruz, ama miras almak hem karmaşık hem de esnek değil.
@@ -226,48 +155,122 @@ logger_full.log("Bir hata oluştu!")
 
 ---
 
-### Command Pattern
+### Facade Pattern (Structural)
 
 **🧠 Problem:**  
-Bir nesne, bir işlemi tetiklemek istiyor ama işlemin nasıl yapılacağını bilmek istemiyor (örneğin, uzaktan kumanda → lamba).
+Bir bilgisayar başlatmak için birçok adım gerekiyor: CPU başlat, bellek yükle, sabit disk çalıştır vs. Kullanıcı için bu karmaşayı gizlemek istiyoruz.
 
 **✅ Çözüm:**  
-Command pattern, işlemleri nesneler olarak soyutlar. Böylece işlemler sıraya alınabilir, geri alınabilir, loglanabilir.
+Facade Pattern, karmaşık sistemleri basitleştirerek kullanıcıya tek bir arayüz üzerinden kolay kullanım sağlar.
 
 ```ruby
-class UserService
-  def create(name) = puts "Kullanıcı oluşturuldu: #{name}"
+class CPU
+  def start; puts "CPU başlatıldı"; end
 end
 
-class CreateUserCommand
-  def initialize(service, name)
-    @service, @name = service, name
+class Memory
+  def load; puts "Bellek yüklendi"; end
+end
+
+class HardDrive
+  def spin; puts "Disk döndürülüyor"; end
+end
+
+# Facade
+class Computer
+  def initialize
+    @cpu = CPU.new
+    @memory = Memory.new
+    @hard_drive = HardDrive.new
   end
 
-  def execute
-    @service.create(@name)
+  def start
+    @cpu.start
+    @memory.load
+    @hard_drive.spin
+    puts "Bilgisayar hazır!"
   end
 end
 
-class CommandInvoker
-  def initialize = @commands = []
-  def add(cmd) = @commands << cmd
-  def run
-    @commands.each(&:execute)
-    @commands.clear
-  end
-end
-
-service = UserService.new
-cmd = CreateUserCommand.new(service, "Zeynep")
-invoker = CommandInvoker.new
-invoker.add(cmd)
-invoker.run
+# Kullanım
+pc = Computer.new
+pc.start
 ```
 
 ---
 
-### Template Method Pattern
+### Observer Pattern (Behavioral)
+
+**🧠 Problem:**  
+Bir nesnede (subject) değişiklik olduğunda, bu değişiklikten haberdar olması gereken başka nesneler (observers) olabilir. Ancak doğrudan çağrı yapılması, bileşenleri birbirine sıkı sıkıya bağlar.
+
+**✅ Çözüm:**  
+Observer pattern, "yayınla-abone ol" (publish-subscribe) ilişkisi kurar. Subject değiştiğinde, tüm subscriber'lar otomatik olarak bilgilendirilir.
+
+```ruby
+require 'observer'
+
+class NewsAgency
+  include Observable
+
+  def publish(news)
+    changed
+    notify_observers(news)
+  end
+end
+
+class Subscriber
+  def update(news)
+    puts "Yeni haber: #{news}"
+  end
+end
+
+agency = NewsAgency.new
+user = Subscriber.new
+agency.add_observer(user)
+agency.publish("Ruby 4.0 duyuruldu!")
+```
+
+---
+
+### Strategy Pattern (Behavioral)
+
+**🧠 Problem:**  
+Bir işlemin (örneğin ödeme) birden fazla yolu olabilir ve bu yollar koşullarla belirleniyor olabilir. Koşul içeren if/else yapıları kodu karmaşıklaştırır.
+
+**✅ Çözüm:**  
+Strategy pattern, davranışları sınıflar haline getirir ve çalışma zamanında bunları değiştirebilir hale getirir.
+
+```ruby
+class PaymentContext
+  def initialize(strategy)
+    @strategy = strategy
+  end
+
+  def pay(amount)
+    @strategy.pay(amount)
+  end
+end
+
+class CreditCard
+  def pay(amount)
+    puts "#{amount} TL kredi kartıyla ödendi"
+  end
+end
+
+class PayPal
+  def pay(amount)
+    puts "#{amount} TL PayPal ile ödendi"
+  end
+end
+
+context = PaymentContext.new(PayPal.new)
+context.pay(150)
+```
+
+---
+
+### Template Method Pattern (Behavioral)
 
 **🧠 Problem:**  
 Bir algoritmanın iskeleti sabit, ama bazı adımlar özelleştirilebilir olmalı.
