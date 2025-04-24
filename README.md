@@ -48,7 +48,7 @@ puts AppConfig.instance.get(:theme)
 
 ### Prototype Pattern
 **🧠 Problem:**  
-Bir nesnenin oluşturulmasında ortak özellikler kullanılacaksa, bu ortak özellikleri 'new' ile tekrar vererek oluşturmamız gerekir.
+Bir nesnenin oluşturulmasında ortak özellikler kullanılacaksa, bu ortak özellikleri `new` ile tekrar vererek oluşturmamız gerekir.
 
 **✅ Çözüm:**  
 Bu nesnede bir sürü ortak özellik varsa ve yeni nesnede sadece isim değişecek ise new ile nesne oluşturmak yerine mevcut bir nesnenin clone oluşturup bu yeni nesnede daha az değişiklik yaparak kullanabiliriz.
