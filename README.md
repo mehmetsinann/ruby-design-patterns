@@ -46,6 +46,35 @@ puts AppConfig.instance.get(:theme)
 
 ---
 
+### Prototype Pattern
+**🧠 Problem:**  
+Bir nesnenin oluşturulmasında ortak özellikler kullanılacaksa, bu ortak özellikleri 'new' ile tekrar vererek oluşturmamız gerekir.
+
+**✅ Çözüm:**  
+Bu nesnede bir sürü ortak özellik varsa ve yeni nesnede sadece isim değişecek ise new ile nesne oluşturmak yerine mevcut bir nesnenin clone oluşturup bu yeni nesnede daha az değişiklik yaparak kullanabiliriz.
+
+```ruby
+class Robot
+  attr_accessor :name, :type
+
+  def initialize(name, type)
+    @name = name
+    @type = type
+  end
+
+  def clone
+    self.dup
+  end
+end
+
+prototype = Robot.new("RX-0", "Worker")
+
+robot1 = prototype.clone
+robot1.name = "RX-1"
+```
+
+---
+
 ### Observer Pattern
 
 **🧠 Problem:**  
